@@ -1,0 +1,128 @@
+piece:
+  tonic: C
+  scale_type: major
+  lowest_note: G2
+  highest_note: G5
+  n_measures: 8
+  lines_durations:
+    - null
+    - null
+    - null
+    - null
+  duration_weights:
+    0.125: 0.1
+    0.25: 0.4
+    0.5: 0.4
+    1.0: 0.1
+  valid_rhythmic_patterns:
+    - [1.0]
+    - [0.5, 0.5]
+    - [0.5, 0.25, 0.25]
+    - [0.5, 0.25, 0.125, 0.125]
+    - [0.25, 0.25, 0.25, 0.25]
+    - [0.25, 0.25, 0.25, 0.125, 0.125]
+    - [0.25, 0.125, 0.125, 0.25, 0.25]
+    - [0.5, 1.0]
+    - [0.25, 0.25, 1.0]
+    - [0.25, 0.125, 0.125, 1.0]
+  custom_position_types: {}
+
+evaluation:
+  scoring_coefs:
+    absence_of_large_intervals: 1
+    absence_of_narrow_ranges: 1
+    absence_of_parallel_intervals: 1
+    absence_of_voice_crossing: 1
+    conjunct_motion: 1
+    dominance_of_tertian_harmony: 1
+    harmonic_stability: 1
+    tonal_stability: 1
+  scoring_fn_params:
+    absence_of_large_intervals:
+      max_n_semitones: 16
+    absence_of_narrow_ranges:
+      range_size: 9
+      penalties:
+        2: 1
+        3: 0.5
+    absence_of_parallel_intervals:
+      n_degrees_to_penalty:
+        4: 0.5
+        7: 1.0
+    conjunct_motion:
+      penalty_deduction_per_line: 1.0
+      n_semitones_to_penalty:
+        0: 0.2
+        1: 0.0
+        2: 0.0
+        3: 0.1
+        4: 0.2
+        5: 0.3
+        6: 0.4
+        7: 0.5
+        8: 0.6
+        9: 0.7
+        10: 0.8
+        11: 0.9
+        12: 1.0
+    harmonic_stability:
+      stability_ranges:
+        beginning: [0.8, 1.0]
+        ending: [0.9, 1.0]
+        downbeat: [0.75, 1.0]
+        middle: [0.5, 0.9]
+        other: [0.25, 0.8]
+      n_semitones_to_stability:
+        0: 1.0
+        1: 0.2
+        2: 0.2
+        3: 0.7
+        4: 0.8
+        5: 0.5
+        6: 0.0
+        7: 0.9
+        8: 0.6
+        9: 0.6
+        10: 0.2
+        11: 0.2
+    tonal_stability:
+      stability_ranges:
+        beginning: [0.7, 1.0]
+        ending: [0.9, 1.0]
+        downbeat: [0.7, 1.0]
+        middle: [0.5, 0.9]
+        other: [0.2, 0.8]
+      degree_to_stability:
+        1: 1.0
+        2: 0.4
+        3: 0.7
+        4: 0.4
+        5: 0.8
+        6: 0.4
+        7: 0.0
+
+optimization:
+  n_passes: 3
+  fraction_to_try: 0.5
+  perturbation_probability: 0.3
+
+rendering:
+  dir: outputs
+  common:
+    measure_in_seconds: 2.0
+    opening_silence_in_seconds: 1.0
+    trailing_silence_in_seconds: 1.0
+  midi:
+    instruments:
+      - 0
+      - 0
+      - 0
+      - 0
+    velocity: 100
+  sinethesizer:
+    instruments:
+      - brass
+      - woodwind
+      - bowed_string
+      - woodwind
+    velocity: 0.8
