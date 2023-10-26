@@ -151,15 +151,15 @@ def run_variable_neighborhood_search(
             result = update_one_sonority(
                 result, position, fraction_to_try, evaluation_params
             )
-        print(f"Results after pass #{pass_number}:")
-        evaluate(result['piece'], **evaluation_params, verbose=True)
+        # print(f"Results after pass #{pass_number}:")
+        evaluate(result['piece'], **evaluation_params, verbose=False)
         if result['score'] > best_result['score']:
             best_result = deepcopy(result)
         elif result['score'] <= previous_result['score']:
-            print("Local optimum is reached, perturbation is needed.")
+            # print("Local optimum is reached, perturbation is needed.")
             new_piece = perturb(result['piece'], perturbation_probability)
-            print("Results after perturbation:")
-            score = evaluate(new_piece, **evaluation_params, verbose=True)
+            # print("Results after perturbation:")
+            score = evaluate(new_piece, **evaluation_params, verbose=False)
             result = {'piece': deepcopy(new_piece), 'score': score}
         previous_result = deepcopy(result)
     final_piece = best_result['piece']

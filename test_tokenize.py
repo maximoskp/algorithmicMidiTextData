@@ -16,8 +16,13 @@ midi_list = os.listdir(midi_path)
 
 for m in midi_list:
     file_name = m.split('.')[0]
-    print(file_name)
     midi_tokens = midi_tokenizer( midi_path + m )
     with open(text_path + file_name + '.txt', 'r') as file:
         text = file.read().rstrip()
-    print(text)
+    df.at[file_name, 'text'] = text
+    df.at[file_name, 'midi_tokens'] = midi_tokens[0].tokens
+# end for
+
+# save results
+df.to_pickle('data/' + 'test_df.pkl')
+df.to_csv('data/' + 'test_df.csv')
