@@ -1,9 +1,7 @@
-from geniartor_mod import piece, optimization, rendering
+from geniartor_mod import piece, optimization, rendering, utils
 import yaml
 import os
 import numpy as np
-from datetime import datetime
-from uuid import uuid4
 import pandas as pd
 from copy import deepcopy
 
@@ -62,9 +60,7 @@ for _ in range(number_of_trials):
     for i, k in enumerate(config_speed_keys):
         settings['piece']['duration_weights'][k] = speeds[speed_key][i]
 
-    message = 'A ' + bars_number_key + ' segment that is ' + str(bars_number[bars_number_key]) + \
-        ' bars long, in the key of ' + tonic + ' ' + mode + ', within the ' + register_key + \
-        ' range of notes, with ' + speed_key + ' rhythm' + '.'
+    message = utils.construct_message(bars_number, bars_number_key, tonic, mode, register_key, speed_key)
 
     generated_piece = piece.generate_random_piece(**settings['piece'])
 
@@ -76,7 +72,7 @@ for _ in range(number_of_trials):
 
     # make name code
     # tmp_name = datetime.now().strftime("%Y%m%d-%H%M%S")
-    tmp_name = datetime.now().strftime("%y%m%d%H%M%S%f") + str(uuid4()).replace('-', '')
+    tmp_name = utils.get_unique_name()
 
     results_dir = settings['rendering']['dir']
     settings['rendering']['midi_name'] = tmp_name + '.mid'
