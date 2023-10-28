@@ -1,6 +1,7 @@
 from miditok import REMI
 import os
 import pandas as pd
+from tqdm import tqdm
 
 # keep all file names, texts, midi_tokens and have an empty column for text_tokens
 df = pd.DataFrame(columns=['name', 'text', 'midi_tokens', 'text_tokens'])
@@ -14,7 +15,8 @@ text_path = 'data/texts/'
 
 midi_list = os.listdir(midi_path)
 
-for m in midi_list:
+for i in tqdm(range(len(midi_list))):
+    m = midi_list[i]
     file_name = m.split('.')[0]
     midi_tokens = midi_tokenizer( midi_path + m )
     with open(text_path + file_name + '.txt', 'r') as file:
