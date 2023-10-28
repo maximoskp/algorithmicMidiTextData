@@ -7,7 +7,7 @@ from tqdm import tqdm
 df = pd.DataFrame(columns=['name', 'text', 'midi_tokens', 'text_tokens'])
 df = df.set_index(['name'])
 
-print(df)
+# TODO: first get all texts and tokenize
 
 midi_tokenizer = REMI()
 midi_path = 'data/midis/'
