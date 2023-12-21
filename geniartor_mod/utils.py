@@ -23,5 +23,7 @@ def construct_message(bars_number, bars_number_key, tonic, mode, register_key, s
         message = 'A ' + tonic + ' ' + mode  + ' ' + phrase_segment + ',' + ' with a ' + bars_number_key + ' length of ' + str(bars_number[bars_number_key]) + \
         ' bars,'  + ' with ' + speed_key + ' ' + speed_rhythm + ', in the ' + register_key + \
         ' range of ' + notes_pitches + '.'
+    # replace sharp
+    message = message.replace('#', ' sharp')
     return message
 # end construct_message

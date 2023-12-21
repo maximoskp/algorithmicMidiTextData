@@ -6,7 +6,7 @@ import pandas as pd
 from copy import deepcopy
 from tqdm import tqdm
 
-number_of_trials = 2400
+number_of_trials = 120
 
 cwd = os.getcwd()
 config_path = cwd + '/configs/two_parts_template.yml'
