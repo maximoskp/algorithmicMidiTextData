@@ -18,6 +18,13 @@ os.makedirs('data/texts', exist_ok=True)
 with open(config_path) as config_file:
     initial_settings = yaml.load(config_file, Loader=yaml.FullLoader)
 
+# for downstream classification tasks
+bars_number_key_idxs = []
+tonic_idxs = []
+mode_idxs = []
+register_key_idxs = []
+speed_idxs = []
+
 for i in tqdm(range(number_of_trials)):
     settings = deepcopy(initial_settings)
     # lenght in bars
@@ -27,14 +34,17 @@ for i in tqdm(range(number_of_trials)):
         'large': 16
     }
     bars_number_keys = list(bars_number.keys())
-    bars_number_key = bars_number_keys[int(np.random.randint(len(bars_number_keys)))]
+    bars_number_key_idx = int(np.random.randint(len(bars_number_keys)))
+    bars_number_key = bars_number_keys[bars_number_key_idx]
     settings['piece']['n_measures'] = bars_number[bars_number_key]
 
     # define tonality
     tonics = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     modes = ['major', 'natural_minor', 'harmonic_minor', 'dorian']
-    tonic = tonics[int(np.random.randint(len(tonics)))]
-    mode = modes[int(np.random.randint(len(modes)))]
+    tonic_idx = int(np.random.randint(len(tonics)))
+    mode_idx = int(np.random.randint(len(modes)))
+    tonic = tonics[tonic_idx]
+    mode = modes[mode_idx]
     settings['piece']['tonic'] = tonic
     settings['piece']['scale_type'] = mode
 
@@ -45,7 +55,8 @@ for i in tqdm(range(number_of_trials)):
         'high': ['D4', 'G5'],
     }
     register_keys = list(registers.keys())
-    register_key = register_keys[int(np.random.randint(len(register_keys)))]
+    register_key_idx = int(np.random.randint(len(register_keys)))
+    register_key = register_keys[register_key_idx]
     settings['piece']['lowest_note'] = registers[register_key][0]
     settings['piece']['highest_note'] = registers[register_key][1]
 
@@ -57,7 +68,8 @@ for i in tqdm(range(number_of_trials)):
         'slow': [0.1, 0.1, 0.4, 0.4]
     }
     speed_keys = list(speeds.keys())
-    speed_key = speed_keys[int(np.random.randint(len(speed_keys)))]
+    speed_idx = int(np.random.randint(len(speed_keys)))
+    speed_key = speed_keys[speed_idx]
     for i, k in enumerate(config_speed_keys):
         settings['piece']['duration_weights'][k] = speeds[speed_key][i]
 
@@ -80,6 +92,13 @@ for i in tqdm(range(number_of_trials)):
     if not os.path.isdir(results_dir):
         os.mkdir(results_dir)
     rendering.render(generated_piece, settings['rendering'])
+
+    # save for downstream tasks
+    bars_number_key_idxs.append( bars_number_key_idx )
+    tonic_idxs.append( tonic_idx )
+    mode_idxs.append( mode_idx )
+    register_key_idxs.append( register_key_idx )
+    speed_idxs.append( speed_idx )
 
     # save text
     text_output_path = 'data/texts/'
