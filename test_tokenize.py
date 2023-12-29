@@ -46,4 +46,4 @@ for i in tqdm(range(len(midi_list[:10]))):
 
 # save results
 df.to_pickle('data/' + 'test_df.pkl')
-df.to_csv('data/' + 'test_df.csv')
+df.to_csv('data/' + 'midi_text.csv')

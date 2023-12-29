@@ -107,3 +107,20 @@ for i in tqdm(range(number_of_trials)):
     text_file.write( message )
     text_file.close()
 # end for
+
+# save dataframe for downstream tasks
+d = {
+    'bars_number_key_idxs': bars_number_key_idxs,
+    'tonic_idxs': tonic_idxs,
+    'mode_idxs': mode_idxs,
+    'register_key_idxs': register_key_idxs,
+    'speed_idxs': speed_idxs
+}
+bars_number_key_idxs.append( bars_number_key_idx )
+tonic_idxs.append( tonic_idx )
+mode_idxs.append( mode_idx )
+register_key_idxs.append( register_key_idx )
+speed_idxs.append( speed_idx )
+
+downstram_df = pd.DataFrame.from_dict(d)
+downstram_df.to_csv('data/' + 'downdstream_df.csv')
