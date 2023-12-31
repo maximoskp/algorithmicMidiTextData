@@ -5,8 +5,9 @@ import numpy as np
 import pandas as pd
 from copy import deepcopy
 from tqdm import tqdm
+import pickle
 
-number_of_trials = 120
+number_of_trials = 3*3*3*4*12*10
 
 cwd = os.getcwd()
 config_path = cwd + '/configs/two_parts_template.yml'
@@ -18,29 +19,52 @@ os.makedirs('data/texts', exist_ok=True)
 with open(config_path) as config_file:
     initial_settings = yaml.load(config_file, Loader=yaml.FullLoader)
 
+# lenght in bars
+bars_number = {
+    'small': 4,
+    'medium': 8,
+    'large': 16
+}
+# define tonality
+tonics = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+modes = ['major', 'natural_minor', 'harmonic_minor', 'dorian']
+# define register
+registers = {
+    'full': ['G2', 'G5'],
+    'low': ['G2', 'D4'],
+    'high': ['D4', 'G5'],
+}
+# rhythm speed
+config_speed_keys = [0.125, 0.25, 0.5, 1]
+speeds = {
+    'fast': [0.4, 0.4, 0.1, 0.1],
+    'medium': [0.1, 0.4, 0.4, 0.1],
+    'slow': [0.1, 0.1, 0.4, 0.4]
+}
+
 # for downstream classification tasks
+name = []
 bars_number_key_idxs = []
 tonic_idxs = []
 mode_idxs = []
 register_key_idxs = []
 speed_idxs = []
+# downstream info
+downstream_info = {
+    'bars_number_key_idxs': bars_number,
+    'tonic_idxs': tonics,
+    'mode_idxs': modes,
+    'register_key_idxs': registers,
+    'speed_idxs': speeds
+}
 
 for i in tqdm(range(number_of_trials)):
     settings = deepcopy(initial_settings)
-    # lenght in bars
-    bars_number = {
-        'small': 4,
-        'medium': 8,
-        'large': 16
-    }
     bars_number_keys = list(bars_number.keys())
     bars_number_key_idx = int(np.random.randint(len(bars_number_keys)))
     bars_number_key = bars_number_keys[bars_number_key_idx]
     settings['piece']['n_measures'] = bars_number[bars_number_key]
 
-    # define tonality
-    tonics = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-    modes = ['major', 'natural_minor', 'harmonic_minor', 'dorian']
     tonic_idx = int(np.random.randint(len(tonics)))
     mode_idx = int(np.random.randint(len(modes)))
     tonic = tonics[tonic_idx]
@@ -48,25 +72,12 @@ for i in tqdm(range(number_of_trials)):
     settings['piece']['tonic'] = tonic
     settings['piece']['scale_type'] = mode
 
-    # define register
-    registers = {
-        'full': ['G2', 'G5'],
-        'low': ['G2', 'D4'],
-        'high': ['D4', 'G5'],
-    }
     register_keys = list(registers.keys())
     register_key_idx = int(np.random.randint(len(register_keys)))
     register_key = register_keys[register_key_idx]
     settings['piece']['lowest_note'] = registers[register_key][0]
     settings['piece']['highest_note'] = registers[register_key][1]
 
-    # rhythm speed
-    config_speed_keys = [0.125, 0.25, 0.5, 1]
-    speeds = {
-        'fast': [0.4, 0.4, 0.1, 0.1],
-        'medium': [0.1, 0.4, 0.4, 0.1],
-        'slow': [0.1, 0.1, 0.4, 0.4]
-    }
     speed_keys = list(speeds.keys())
     speed_idx = int(np.random.randint(len(speed_keys)))
     speed_key = speed_keys[speed_idx]
@@ -86,6 +97,7 @@ for i in tqdm(range(number_of_trials)):
     # make name code
     # tmp_name = datetime.now().strftime("%Y%m%d-%H%M%S")
     tmp_name = utils.get_unique_name()
+    name.append(tmp_name)
 
     results_dir = settings['rendering']['dir']
     settings['rendering']['midi_name'] = tmp_name + '.mid'
@@ -110,17 +122,16 @@ for i in tqdm(range(number_of_trials)):
 
 # save dataframe for downstream tasks
 d = {
+    'name': name,
     'bars_number_key_idxs': bars_number_key_idxs,
     'tonic_idxs': tonic_idxs,
     'mode_idxs': mode_idxs,
     'register_key_idxs': register_key_idxs,
     'speed_idxs': speed_idxs
 }
-bars_number_key_idxs.append( bars_number_key_idx )
-tonic_idxs.append( tonic_idx )
-mode_idxs.append( mode_idx )
-register_key_idxs.append( register_key_idx )
-speed_idxs.append( speed_idx )
 
 downstram_df = pd.DataFrame.from_dict(d)
 downstram_df.to_csv('data/' + 'downdstream_df.csv')
+
+with open('downstream_info.pickle', 'wb') as handle:
+    pickle.dump(downstream_info, handle, protocol=pickle.HIGHEST_PROTOCOL)

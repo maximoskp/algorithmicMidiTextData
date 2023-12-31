@@ -7,7 +7,16 @@ from tqdm import tqdm
 df = pd.DataFrame(columns=['name', 'text', 'midi'])
 df = df.set_index(['name'])
 
-# Our tokenizer's configuration
+# load downstream
+df_downstream_targets = pd.read_csv('data/' + 'downdstream_df.csv')
+df_downstream_targets = df_downstream_targets.set_index(['name'])
+downstream_keys = ['bars_number_key_idxs', 'tonic_idxs', 'mode_idxs', \
+                   'register_key_idxs', 'speed_idxs']
+df_downstream = pd.DataFrame(columns=['name', 'text', 'midi', 'bars_number_key_idxs',\
+                                      'tonic_idxs', 'mode_idxs', 'register_key_idxs', 'speed_idxs'])
+df_downstream = df_downstream.set_index(['name'])
+
+#/ Our tokenizer's configuration
 PITCH_RANGE = (21, 109)
 BEAT_RES = {(0, 1): 8, (1, 2): 4, (2, 4): 2, (4, 8): 1}
 NB_VELOCITIES = 24
@@ -48,11 +57,18 @@ for i in tqdm(range(len(midi_list))):
         text = file.read().rstrip()
     df.at[file_name, 'text'] = text
     df.at[file_name, 'midi'] = (' ').join(midi_tokens[0].tokens)
+    # pass downstream
+    df_downstream.at[file_name, 'text'] = text
+    df_downstream.at[file_name, 'midi'] = (' ').join(midi_tokens[0].tokens)
+    for k in downstream_keys:
+        df_downstream.at[file_name, k] = df_downstream_targets.at[file_name, k]
 # end for
 
 # save results
 df.to_pickle('data/' + 'texts_df.pkl')
 df.to_csv('data/' + 'texts_df.csv')
+# save downstream
+df_downstream.to_csv('data/' + 'downstream_in_out_df.csv')
 
 
 '''

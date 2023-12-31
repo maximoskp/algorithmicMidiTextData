@@ -25,5 +25,30 @@ def construct_message(bars_number, bars_number_key, tonic, mode, register_key, s
         ' range of ' + notes_pitches + '.'
     # replace sharp
     message = message.replace('#', ' sharp')
+    # explanations
+    mode_explainer = {
+        'major': [
+            'Since it is in a major scale it has major third, major sixth and major seventh.',
+            'The difference of its scale in comparison to a natural minor, is that it has major third, sixth and seventh.',
+            'The fact that it is in the major scale makes this ' + phrase_segment + ' have a happy feeling, mainly expressed through the presence of the major third.'
+        ],
+        'natural_minor': [
+            'Since it is in a natural minor scale it has minor third, minor sixth and minor seventh.',
+            'The difference of its scale in comparison to major, is that it has minor third, sixth and seventh.',
+            'The fact that it is in the natural minor scale makes this ' + phrase_segment + ' have a sad feeling, mainly expressed through the presence of the minor third and sixth.'
+        ],
+        'harmonic_minor': [
+            'Since it is in a harmonic minor scale it has minor third, minor sixth but a major seventh.',
+            'The difference of its scale in comparison to major, is that it has minor third and sixth while it retains the major seventh.',
+            'The fact that it is in the harmonic minor scale makes this ' + phrase_segment + ' have a sad feeling, mainly expressed through the presence of the minor third and sixth, with strong resolution to the tonic, as an effect of the major seventh.'
+        ],
+        'dorian': [
+            'Since it is in a dorian scale it has minor third and minor seventh but a major sixth.',
+            'The difference of its scale in comparison to major, is that it has minor third and seventh while it retains the major seventh.',
+            'The fact that it is in the dorian scale makes this ' + phrase_segment + ' have a mildly sad feeling, as it has a minor third, but the major sixth has a happinnes element.'
+        ]
+    }
+    d3 = np.random.randint(3)
+    message += ' ' + mode_explainer[mode][d3]
     return message
 # end construct_message
