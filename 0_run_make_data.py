@@ -7,8 +7,6 @@ from copy import deepcopy
 from tqdm import tqdm
 import pickle
 
-number_of_trials = 3*3*3*4*12*10
-
 cwd = os.getcwd()
 config_path = cwd + '/configs/two_parts_template.yml'
 
@@ -58,68 +56,77 @@ downstream_info = {
     'speed_idxs': speeds
 }
 
-for i in tqdm(range(number_of_trials)):
-    settings = deepcopy(initial_settings)
-    bars_number_keys = list(bars_number.keys())
-    bars_number_key_idx = int(np.random.randint(len(bars_number_keys)))
-    bars_number_key = bars_number_keys[bars_number_key_idx]
-    settings['piece']['n_measures'] = bars_number[bars_number_key]
+bars_keys = list(bars_number.keys())
+bars_keys_number = len(bars_keys)
+tonics_number = len(tonics)
+modes_number = len(modes)
+register_keys = list(registers.keys())
+register_keys_number = len(register_keys)
+speed_keys = list(speeds.keys())
+speed_keys_number = len(speed_keys)
+reps = 10
+current_rep = 0
 
-    tonic_idx = int(np.random.randint(len(tonics)))
-    mode_idx = int(np.random.randint(len(modes)))
-    tonic = tonics[tonic_idx]
-    mode = modes[mode_idx]
-    settings['piece']['tonic'] = tonic
-    settings['piece']['scale_type'] = mode
+number_of_trials = bars_keys_number*tonics_number*modes_number*register_keys_number*speed_keys_number*reps
+for bars_idx in range(bars_keys_number):
+    for tonic_idx in range(tonics_number):
+        for mode_idx in range(modes_number):
+            for register_idx in range(register_keys_number):
+                for speed_idx in range(speed_keys_number):
+                    for rep in range(reps):
+                        current_rep += 1
+                        print('current_rep = ' + str(current_rep) + '/' + str(number_of_trials), end='\r')
+                        settings = deepcopy(initial_settings)
+                        # bars
+                        bars_number_key = bars_keys[bars_idx]
+                        settings['piece']['n_measures'] = bars_number[bars_number_key]
+                        # tonic and mode
+                        tonic = tonics[tonic_idx]
+                        mode = modes[mode_idx]
+                        settings['piece']['tonic'] = tonic
+                        settings['piece']['scale_type'] = mode
+                        # register
+                        register_key = register_keys[register_idx]
+                        settings['piece']['lowest_note'] = registers[register_key][0]
+                        settings['piece']['highest_note'] = registers[register_key][1]
+                        # speed
+                        speed_key = speed_keys[speed_idx]
+                        for i, k in enumerate(config_speed_keys):
+                            settings['piece']['duration_weights'][k] = speeds[speed_key][i]
+                        message = utils.construct_message(bars_number, bars_number_key, tonic, mode, register_key, speed_key)
+                        generated_piece = piece.generate_random_piece(**settings['piece'])
+                        n_passes = settings['optimization']['n_passes']
+                        settings['optimization']['n_passes'] = n_passes
+                        generated_piece = optimization.run_variable_neighborhood_search(
+                            generated_piece, settings['evaluation'], **settings['optimization']
+                        )
+                        # make name code
+                        tmp_name = 'b' + str(bars_idx) + '_t' + str(tonic_idx) + '_m' + \
+                            str(mode_idx) + '_r' + str(register_idx) + '_s' + \
+                                str(speed_idx) + '_r' + str(rep)
+                        name.append(tmp_name)
 
-    register_keys = list(registers.keys())
-    register_key_idx = int(np.random.randint(len(register_keys)))
-    register_key = register_keys[register_key_idx]
-    settings['piece']['lowest_note'] = registers[register_key][0]
-    settings['piece']['highest_note'] = registers[register_key][1]
+                        results_dir = settings['rendering']['dir']
+                        settings['rendering']['midi_name'] = tmp_name + '.mid'
+                        if not os.path.isdir(results_dir):
+                            os.mkdir(results_dir)
+                        rendering.render(generated_piece, settings['rendering'])
 
-    speed_keys = list(speeds.keys())
-    speed_idx = int(np.random.randint(len(speed_keys)))
-    speed_key = speed_keys[speed_idx]
-    for i, k in enumerate(config_speed_keys):
-        settings['piece']['duration_weights'][k] = speeds[speed_key][i]
+                        # save for downstream tasks
+                        bars_number_key_idxs.append( bars_idx )
+                        tonic_idxs.append( tonic_idx )
+                        mode_idxs.append( mode_idx )
+                        register_key_idxs.append( register_idx )
+                        speed_idxs.append( speed_idx )
 
-    message = utils.construct_message(bars_number, bars_number_key, tonic, mode, register_key, speed_key)
-
-    generated_piece = piece.generate_random_piece(**settings['piece'])
-
-    n_passes = settings['optimization']['n_passes']
-    settings['optimization']['n_passes'] = n_passes
-    generated_piece = optimization.run_variable_neighborhood_search(
-        generated_piece, settings['evaluation'], **settings['optimization']
-    )
-
-    # make name code
-    # tmp_name = datetime.now().strftime("%Y%m%d-%H%M%S")
-    tmp_name = utils.get_unique_name()
-    name.append(tmp_name)
-
-    results_dir = settings['rendering']['dir']
-    settings['rendering']['midi_name'] = tmp_name + '.mid'
-    if not os.path.isdir(results_dir):
-        os.mkdir(results_dir)
-    rendering.render(generated_piece, settings['rendering'])
-
-    # save for downstream tasks
-    bars_number_key_idxs.append( bars_number_key_idx )
-    tonic_idxs.append( tonic_idx )
-    mode_idxs.append( mode_idx )
-    register_key_idxs.append( register_key_idx )
-    speed_idxs.append( speed_idx )
-
-    # save text
-    text_output_path = 'data/texts/'
-    text_filen_name = tmp_name + '.txt'
-    text_file = open( text_output_path + text_filen_name , 'w')
-    text_file.write( message )
-    text_file.close()
-# end for
-
+                        # save text
+                        text_output_path = 'data/texts/'
+                        text_filen_name = tmp_name + '.txt'
+                        text_file = open( text_output_path + text_filen_name , 'w')
+                        text_file.write( message )
+                        text_file.close()
+# end fors
+                        
 # save dataframe for downstream tasks
 d = {
     'name': name,

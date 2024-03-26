@@ -70,6 +70,54 @@ df.to_csv('data/' + 'texts_df.csv')
 # save downstream
 df_downstream.to_csv('data/' + 'downstream_in_out_df.csv')
 
+# 10pc ===================================================================
+midi_path = 'data/midis10pc/'
+text_path = 'data/texts/'
+
+midi_list = os.listdir(midi_path)
+
+for i in tqdm(range(len(midi_list))):
+    m = midi_list[i]
+    file_name = m.split('.')[0]
+    midi_tokens = midi_tokenizer( midi_path + m )
+    with open(text_path + file_name + '.txt', 'r') as file:
+        text = file.read().rstrip()
+    df.at[file_name, 'text'] = text
+    df.at[file_name, 'midi'] = (' ').join(midi_tokens[0].tokens)
+    # pass downstream
+    df_downstream.at[file_name, 'text'] = text
+    df_downstream.at[file_name, 'midi'] = (' ').join(midi_tokens[0].tokens)
+    for k in downstream_keys:
+        df_downstream.at[file_name, k] = df_downstream_targets.at[file_name, k]
+# end for
+
+# save downstream
+df_downstream.to_csv('data/' + 'downstream_in_out_df_10pc.csv')
+
+# 20pc ===================================================================
+midi_path = 'data/midis10pc/'
+text_path = 'data/texts/'
+
+midi_list = os.listdir(midi_path)
+
+for i in tqdm(range(len(midi_list))):
+    m = midi_list[i]
+    file_name = m.split('.')[0]
+    midi_tokens = midi_tokenizer( midi_path + m )
+    with open(text_path + file_name + '.txt', 'r') as file:
+        text = file.read().rstrip()
+    df.at[file_name, 'text'] = text
+    df.at[file_name, 'midi'] = (' ').join(midi_tokens[0].tokens)
+    # pass downstream
+    df_downstream.at[file_name, 'text'] = text
+    df_downstream.at[file_name, 'midi'] = (' ').join(midi_tokens[0].tokens)
+    for k in downstream_keys:
+        df_downstream.at[file_name, k] = df_downstream_targets.at[file_name, k]
+# end for
+
+# save downstream
+df_downstream.to_csv('data/' + 'downstream_in_out_df_20pc.csv')
+
 
 '''
 # Constructs the vocabulary with BPE, from the token files
