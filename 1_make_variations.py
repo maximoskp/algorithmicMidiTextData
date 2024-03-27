@@ -15,17 +15,14 @@ def generate_random_pitch_variation(input_file, output_file, pitch_range=(-12, 1
     # Create a new MIDI file to write the modified data
     output_mid = mido.MidiFile(type=mid.type, ticks_per_beat=mid.ticks_per_beat)
     for i, track in enumerate(mid.tracks):
-        print('track: ', i)
         output_track = mido.MidiTrack()
         output_mid.tracks.append(output_track)
 
         for msg in track:
-            print('msg: ', msg)
             # Check if the message is a note on or note off message
             if msg.type == 'note_on' and msg.velocity > 0:
                 note = msg.note
                 velocity = msg.velocity
-                print('note_on: ', note)
                 # Determine whether to change the pitch of this note
                 if random.random() < change_percentage:
                     # Randomly adjust the pitch within the specified range
@@ -35,15 +32,11 @@ def generate_random_pitch_variation(input_file, output_file, pitch_range=(-12, 1
                     output_track.append(new_msg)
                     # Update note state
                     note_states.setdefault(note, []).append(new_pitch)
-                    print('changing note_on, new_msg: ', new_msg)
-                    print('changing note_on, note_states: ', note_states)
                 else:
                     # If not changing pitch, just copy the original message
                     output_track.append(msg)
             elif msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0):
                 note = msg.note
-                print('note_off: ', note)
-                print('in note_off, note_states: ', note_states)
                 # Check if note state exists for this note
                 if note in note_states and len(note_states[note]) > 0:
                     # Pop the last pitch adjustment for this note
@@ -51,13 +44,10 @@ def generate_random_pitch_variation(input_file, output_file, pitch_range=(-12, 1
                     # Create a new message with the adjusted pitch
                     new_msg = mido.Message('note_on', note=new_pitch, velocity=msg.velocity, time=msg.time)
                     output_track.append(new_msg)
-                    print('changing note_off, new_msg: ', new_msg)
-                    print('changing note_off, note_states: ', note_states)
                 else:
                     # If note state doesn't exist, just copy the message
                     output_track.append(msg)
             else:
-                print('other message: ', msg)
                 # For other messages, just copy them to the new track
                 output_track.append(msg)
 
