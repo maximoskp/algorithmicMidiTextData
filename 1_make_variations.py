@@ -5,7 +5,7 @@ import os
 import mido
 import random
 
-def generate_random_pitch_variation(input_file, output_file, pitch_range=(-12, 12), change_percentage=0.5):
+def generate_random_pitch_variation(input_file, output_file, pitch_range=(-12, 12), midi_range=[0,127], change_percentage=0.5):
     # Load MIDI file
     mid = mido.MidiFile(input_file)
 
@@ -26,7 +26,7 @@ def generate_random_pitch_variation(input_file, output_file, pitch_range=(-12, 1
                 # Determine whether to change the pitch of this note
                 if random.random() < change_percentage:
                     # Randomly adjust the pitch within the specified range
-                    new_pitch = min(max(note + random.randint(*pitch_range), 0), 127)
+                    new_pitch = min(max(note + random.randint(*pitch_range), midi_range[0]), midi_range[1])
                     # Create a new message with the adjusted pitch
                     new_msg = mido.Message('note_on', note=new_pitch, velocity=velocity)
                     output_track.append(new_msg)
@@ -69,5 +69,5 @@ total = len(os.listdir('data/midis'))
 for midi_file in os.listdir('data/midis'):
     print(str(i) + '/' + str(total), end='\r')
     i += 1
-    generate_random_pitch_variation('data/midis/' + midi_file, 'data/midis10pc/' + midi_file, change_percentage=0.1)
-    generate_random_pitch_variation('data/midis/' + midi_file, 'data/midis20pc/' + midi_file, change_percentage=0.2)
+    generate_random_pitch_variation('data/midis/' + midi_file, 'data/midis10pc/' + midi_file, pitch_range=(-5, 5), midi_range=[22,108], change_percentage=0.1)
+    generate_random_pitch_variation('data/midis/' + midi_file, 'data/midis20pc/' + midi_file, pitch_range=(-5, 5), midi_range=[22,108], change_percentage=0.2)
