@@ -56,18 +56,18 @@ def generate_random_pitch_variation(input_file, output_file, pitch_range=(-12, 1
 # end generate_random_pitch_variation
 
 # Example usage
-# input_file = "input.mid"
-# output_file = "output.mid"
-# generate_random_pitch_variation(input_file, output_file, change_percentage=0.3)  # Change 30% of the notes
+input_file = 'data/tests/b0_t0_m0_r0_s0_r0.mid'
+output_file = 'data/tests/rand_b0_t0_m0_r0_s0_r0.mid'
+generate_random_pitch_variation(input_file, output_file, change_percentage=0.3)  # Change 30% of the notes
 
-# 10% variation
-os.makedirs('data/midis10pc', exist_ok=True)
-# 20% variation
-os.makedirs('data/midis20pc', exist_ok=True)
-i = 0
-total = len(os.listdir('data/midis'))
-for midi_file in os.listdir('data/midis'):
-    print(str(i) + '/' + str(total), end='\r')
-    i += 1
-    generate_random_pitch_variation('data/midis/' + midi_file, 'data/midis10pc/' + midi_file, pitch_range=(-5, 5), midi_range=[22,108], change_percentage=0.1)
-    generate_random_pitch_variation('data/midis/' + midi_file, 'data/midis20pc/' + midi_file, pitch_range=(-5, 5), midi_range=[22,108], change_percentage=0.2)
+# # 10% variation
+# os.makedirs('data/midis10pc', exist_ok=True)
+# # 20% variation
+# os.makedirs('data/midis20pc', exist_ok=True)
+# i = 0
+# total = len(os.listdir('data/midis'))
+# for midi_file in os.listdir('data/midis'):
+#     print(str(i) + '/' + str(total), end='\r')
+#     i += 1
+#     generate_random_pitch_variation('data/midis/' + midi_file, 'data/midis10pc/' + midi_file, pitch_range=(-5, 5), midi_range=[22,108], change_percentage=0.1)
+#     generate_random_pitch_variation('data/midis/' + midi_file, 'data/midis20pc/' + midi_file, pitch_range=(-5, 5), midi_range=[22,108], change_percentage=0.2)
