@@ -36,7 +36,7 @@ tokenizer = REMI(config)
 # prefix = "/data/scratch/efthygeo/midi/max/midis"
 # prefix = "/data/scratch/efthygeo/midi/midi_bach/midis"
 # prefix = "/data/scratch/efthygeo/midi/max_new/clean/midis"
-prefix = "data/midis"
+prefix = "data/midis10pc"
 path_to_dataset = prefix
 path_to_tokens = f'{prefix}_noBPE/'
 path_to_tokens_bpe = f'{prefix}_BPE/'
@@ -47,8 +47,9 @@ def midi_valid(midi):
     # print(f"{midi}")
     # if any(ts.numerator != 4 for ts in midi.time_signature_changes):
     #     return False  # time signature different from 4/*, 4 beats per bar
-    if midi.max_tick < 10 * midi.ticks_per_beat:
-        return False  # this MIDI is too short
+    # if midi.max_tick < 10 * midi.ticks_per_beat:
+    #     print('not ok')
+    #     return False  # this MIDI is too short
     return True
 
 # [2, 1, 1] gives roughly 5.5x
@@ -57,19 +58,22 @@ midi_paths = list(Path(path_to_dataset).glob("**/*.mid"))
 print(f"Found {len(midi_paths)} midi files")
 
 sorted_paths = sorted(midi_paths) # for debugging
+# print(sorted_paths[:100])
 # debug_midi = sorted_paths[:400]
 tokenizer.tokenize_midi_dataset(
     # midi_paths=debug_midi,
     midi_paths=sorted_paths,
+    # midi_paths=midi_paths,
     out_dir=Path(path_to_tokens),
     validation_fn=midi_valid,
     # data_augment_offsets=data_augmentation_offsets,
+    verbose=True
 )
 
-# # Load pretrained tokenizer
-# path_to_bpe = \
-#     "data/GiantMIDI-PIano_BPE_tokenizer.json"
-# bpe_tokenizer = REMI(params=path_to_bpe)
-# # import pdb; pdb.set_trace()
-# # Applies BPE to the previous tokens
-# bpe_tokenizer.apply_bpe_to_dataset(Path(path_to_tokens), Path(path_to_tokens_bpe))
+# Load pretrained tokenizer
+path_to_bpe = \
+    "data/GiantMIDI-PIano_BPE_tokenizer.json"
+bpe_tokenizer = REMI(params=path_to_bpe)
+# import pdb; pdb.set_trace()
+# Applies BPE to the previous tokens
+bpe_tokenizer.apply_bpe_to_dataset(Path(path_to_tokens), Path(path_to_tokens_bpe))

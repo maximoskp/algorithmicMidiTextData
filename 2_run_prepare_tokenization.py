@@ -95,7 +95,7 @@ for i in tqdm(range(len(midi_list))):
 df_downstream.to_csv('data/' + 'downstream_in_out_df_10pc.csv')
 
 # 20pc ===================================================================
-midi_path = 'data/midis10pc/'
+midi_path = 'data/midis20pc/'
 text_path = 'data/texts/'
 
 midi_list = os.listdir(midi_path)
