@@ -41,7 +41,8 @@ dataset_encoded
 
 import librosa
 
-result_dict = {}
+# result_dict = {}
+sequence_dict = {}
 
 print('running model on dataset')
 for i in tqdm(range(len(dataset_encoded['test']))):
@@ -51,11 +52,18 @@ for i in tqdm(range(len(dataset_encoded['test']))):
     wav = dataset['test'][i]['audio']['path']
 
     h = model(tt).last_hidden_state
-    h_mean = np.mean(h.squeeze().detach().numpy(), axis = 0)
+    # h_mean = np.mean(h.squeeze().detach().numpy(), axis = 0)
     
-    result_dict[ wav.split('/')[-1].split('.')[0] ] = h_mean
+    # result_dict[ wav.split('/')[-1].split('.')[0] ] = h_mean
 
-import pandas as pd
+    sequence_dict[wav.split('/')[-1].split('.')[0]] = h.squeeze().detach().numpy()
 
-df = pd.DataFrame.from_dict(result_dict, orient='index', dtype=np.float32).reset_index()
-df.to_csv('data/' + path.split('/')[-1] + '.csv', index=False)
+import pickle
+
+with open('data/' + path.split('/')[-1] + '.pickle', 'wb') as handle:
+    pickle.dump(sequence_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+# import pandas as pd
+
+# df = pd.DataFrame.from_dict(result_dict, orient='index', dtype=np.float32).reset_index()
+# df.to_csv('data/' + path.split('/')[-1] + '.csv', index=False)
